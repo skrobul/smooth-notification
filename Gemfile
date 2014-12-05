@@ -6,3 +6,4 @@ gem "rspec"
 gem 'pry'
 gem 'pry-byebug'
 gem 'celluloid'
+gem 'celluloid-io'
