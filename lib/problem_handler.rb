@@ -4,9 +4,9 @@ require 'celluloid'
 class ProblemMessageHandler
   include Celluloid
 
-  def initialize(notifier, threshold, timesrc)
+  def initialize(notifier, timeout, timesrc)
     @notifier = notifier
-    @deluge_threshold = threshold
+    @deluge_timeout = timeout
     @timesrc = timesrc
     @last_problem_notification = nil
   end
@@ -20,6 +20,6 @@ class ProblemMessageHandler
 
   private
     def deluge_timer_expired?
-      @last_problem_notification.nil? || @timesrc.now >= (@last_problem_notification + @deluge_threshold)
+      @last_problem_notification.nil? || @timesrc.now >= (@last_problem_notification + @deluge_timeout)
     end
 end
