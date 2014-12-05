@@ -12,12 +12,39 @@ class NotificationPipe
   end
 
   def process(msg)
-    if msg.type == :problem
-      # require 'pry'; binding.pry
-      if @last_problem_notification.nil? or @timesrc.now >= (@last_problem_notification + @deluge_threshold)
-        @last_problem_notification = @timesrc.now
-        @notifier.notify msg
-      end
+    require 'pry'; binding.pry
+    case msg.type
+      when :problem
+        send_deluge_notification(msg) if deluge_timer_expired?
+      when :clear
+        if clear_timer_expired?
+          empty_clear_buffer
+        else
+          add_clearmsg_to_buffer msg
+        end
     end
   end
+
+  private
+    def send_deluge_notification(msg)
+      @last_problem_notification = @timesrc.now
+      @notifier.notify msg
+    end
+
+    def deluge_timer_expired?
+      @last_problem_notification.nil? || @timesrc.now >= (@last_problem_notification + @deluge_threshold)
+    end
+
+    def clear_timer_expired?
+      @timesrc.now >= (@clear_buffer_last_flushed + @clearing_interval)
+    end
+
+    def empty_clear_buffer
+      aggregated_messsage = AggregatedMessage.new(@clear_buffer)
+      @notifier.notify aggregated_messsage
+    end
+
+    def add_clearmsg_to_buffer(msg)
+      @clear_buffer << msg
+    end
 end
