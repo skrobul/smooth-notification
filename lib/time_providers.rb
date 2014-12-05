@@ -3,6 +3,10 @@ class NormalTimeProvider
     Time.now
   end
 
+  def sleep(seconds)
+    sleep seconds
+  end
+
   def advance
     raise NotImplemented
   end
@@ -17,5 +21,9 @@ class FakeTimeProvider
 
   def advance(seconds)
     @now += seconds
+  end
+
+  def sleep(seconds)
+    advance(seconds)
   end
 end

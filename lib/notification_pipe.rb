@@ -9,6 +9,7 @@ class NotificationPipe
     @timesrc = opts.fetch(:timesrc, NormalTimeProvider.new)
     @clear_buffer_last_flushed = @timesrc.now
     @last_problem_notification = nil
+    start_clearing_thread
   end
 
   def process(msg)
@@ -26,6 +27,12 @@ class NotificationPipe
   end
 
   private
+    def start_clearing_thread
+      Thread.new do
+        @timesrc.sleep(@clearing_interval)
+        empty_clear_buffer
+      end
+    end
     def send_deluge_notification(msg)
       @last_problem_notification = @timesrc.now
       @notifier.notify msg
