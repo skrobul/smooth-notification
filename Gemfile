@@ -5,3 +5,4 @@ gem "cucumber"
 gem "rspec"
 gem 'pry'
 gem 'pry-byebug'
+gem 'celluloid'
