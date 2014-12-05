@@ -46,17 +46,19 @@ describe NotificationPipe do
     end
     context "when type is clear " do
       context 'when just single message arrives within period' do
+        let(:expected_aggregated_msg) { AggregatedMessage.new([clear_msg], :clear)}
         it 'sends message out one aggregated notification' do
           @npipe.process clear_msg
           @faketime.advance threshold + 1
-          expect(notifier).to have_received(:notify).exactly(:once).with([clear_msg])
+          expect(notifier).to have_received(:notify).exactly(:once).with([expected_aggregated_msg])
         end
       end
       context 'when multiple messages arrive within period' do
+        let(:expected_aggregated_msg) { AggregatedMessage.new([clear_msg] * 10, :clear)}
         it 'should be aggregated' do
           10.times { @npipe.process clear_msg }
           @faketime.advance threshold
-          expect(notifier).to have_received(:notified).with([clear_msg] * 10)
+          expect(notifier).to have_received(:notified).with(expected_aggregated_msg)
         end
       end
     end
