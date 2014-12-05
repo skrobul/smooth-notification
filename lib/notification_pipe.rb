@@ -26,7 +26,7 @@ class NotificationPipe
   end
 
   def handle_incoming_connection(socket)
-   puts  'Incoming connection.'
+   # puts  'Incoming connection.'
    loop { process_incoming_line(socket.readline) }
    rescue EOFError
      # puts 'Notification client disconnected' #Only for debug
