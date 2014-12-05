@@ -1,4 +1,5 @@
 require_relative "./time_providers"
+require_relative './aggregated_message'
 
 class NotificationPipe
   def initialize(opts={})
@@ -13,7 +14,7 @@ class NotificationPipe
   end
 
   def process(msg)
-    require 'pry'; binding.pry
+    # require 'pry'; binding.pry
     case msg.type
       when :problem
         send_deluge_notification(msg) if deluge_timer_expired?
@@ -28,7 +29,8 @@ class NotificationPipe
 
   private
     def start_clearing_thread
-      Thread.new do
+      # TODO: convert me to celluloid !
+      @t = Thread.new do
         @timesrc.sleep(@clearing_interval)
         empty_clear_buffer
       end
