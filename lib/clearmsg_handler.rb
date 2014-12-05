@@ -3,8 +3,9 @@ require_relative './aggregated_message.rb'
 class ClearMessageHandler
   include Celluloid
 
-  def initialize(notifier, clearing_interval)
+  def initialize(notifier, clearing_interval, timesrc)
     @notifier = notifier
+    @timesrc = timesrc
     @msgs = []
     @clearing_interval = clearing_interval
   end
@@ -14,6 +15,7 @@ class ClearMessageHandler
   end
 
   def handle_messages
+    # @timesrc.sleep @clearing_interval
     sleep @clearing_interval
     send_all_messages_in_the_buffer
   end

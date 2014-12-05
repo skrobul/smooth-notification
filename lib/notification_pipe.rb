@@ -1,6 +1,7 @@
 require_relative "./time_providers"
 require_relative './aggregated_message'
 require_relative './clearmsg_handler'
+require_relative './problem_handler'
 require_relative './notification'
 require 'celluloid'
 require 'celluloid/io'
@@ -17,9 +18,11 @@ class NotificationPipe
 
     @deluge_threshold = opts.fetch(:deluge_threshold, 60)
     @clearing_interval = opts.fetch(:clearing_interval, 60)
+
     @timesrc = opts.fetch(:timesrc, NormalTimeProvider.new)
     @last_problem_notification = nil
     start_clearmsg_handler
+    start_problem_msg_handler
   end
 
   def handle_incoming_connection(socket)
@@ -36,7 +39,7 @@ class NotificationPipe
     # require 'pry'; binding.pry
     case msg.notification_type
       when :problem
-        send_deluge_notification(msg) if deluge_timer_expired?
+        @problem_msg_handler.async.handle msg
       when :clear
         @clear_msg_handler.async.handle msg
     end
@@ -51,21 +54,19 @@ class NotificationPipe
       @socket.close
       File.delete(@socket_path)
     end
+    # @clear_msg_handler.terminate
+    # @problem_msg_handler.terminate
   end
 
   private
     def start_clearmsg_handler
-      @clear_msg_handler = ClearMessageHandler.new(@notifier, @clearing_interval)
+      @clear_msg_handler = ClearMessageHandler.new(@notifier, @clearing_interval, @timesrc)
       @clear_msg_handler.async.handle_messages
     end
 
-    def send_deluge_notification(msg)
-      @last_problem_notification = @timesrc.now
-      @notifier.notify msg
-    end
-
-    def deluge_timer_expired?
-      @last_problem_notification.nil? || @timesrc.now >= (@last_problem_notification + @deluge_threshold)
+    def start_problem_msg_handler
+      @problem_msg_handler = ProblemMessageHandler.new(@notifier, @deluge_threshold, @timesrc)
+      # @problem_msg_handler.async.handle_messages
     end
 end
 
