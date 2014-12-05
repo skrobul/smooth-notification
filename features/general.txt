@@ -1,0 +1,7 @@
+1) if there were more than ten messages in the last hour, send a final "deluge alert" and then suppress all further messages until it quietens down.  Do not send more than one "deluge alert" per hour.
+
+Rationale:  in a low-bandwidth medium, like a pager, or like SMS on a 1998 nokia phone, sending too many messages renders the system (and the phone) useless.  Even in email, a large number of messages is annoying, and we are more likely to use the GUI, which does a better job of displaying and summarizing the information.
+
+
+2) if ten things go wrong, you get 6 "down" messages followed by 6 "clear" messages.  We collapsed the "clear" messages into one single "all clear".
+
