@@ -3,8 +3,9 @@ class NormalTimeProvider
     Time.now
   end
 
-  def sleep(seconds)
-    sleep seconds
+  def my_sleep(seconds)
+    puts "Sleeping for #{seconds} seconds"
+    Celluloid.sleep(seconds)
   end
 
   def advance
@@ -23,7 +24,7 @@ class FakeTimeProvider
     @now += seconds
   end
 
-  def sleep(seconds)
+  def my_sleep(seconds)
     advance(seconds)
   end
 end
