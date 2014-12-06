@@ -18,7 +18,9 @@ class Notification
   def self.from_text(text)
     instance = allocate
     return nil unless text.include?('|')
-    msg, notification_type = text.split('|')
+    tokenized_text = text.split('|')
+    notification_type = tokenized_text.pop
+    msg = tokenized_text.join('|')
     instance.send(:initialize, msg, notification_type)
     instance
   end
