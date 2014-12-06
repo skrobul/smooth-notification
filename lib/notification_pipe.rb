@@ -18,6 +18,7 @@ class NotificationPipe
 
     @deluge_threshold = opts.fetch(:deluge_threshold, 60)
     @clearing_interval = opts.fetch(:clearing_interval, 60)
+    @max_messages = opts.fetch(:max_messages, 10)
 
     @timesrc = opts.fetch(:timesrc, NormalTimeProvider.new)
     @last_problem_notification = nil
@@ -65,7 +66,7 @@ class NotificationPipe
     end
 
     def start_problem_msg_handler
-      @problem_msg_handler = ProblemMessageHandler.new(@notifier, @deluge_threshold, @timesrc)
+      @problem_msg_handler = ProblemMessageHandler.new(@notifier, @deluge_threshold, @timesrc, @max_messages)
       # @problem_msg_handler.async.handle_messages
     end
 end
