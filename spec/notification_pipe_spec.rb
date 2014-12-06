@@ -8,11 +8,11 @@ describe NotificationPipe do
   end
 
 
-  let(:notifier) { spy() }
   let(:clear_msg) { double(text: 'something cleared', type: :clear)}
   let(:problem_msg) { double(text: 'something broke', type: :problem)}
 
   context 'when msg is a problem' do
+    let(:notifier) { spy() }
     subject(:npipe) { NotificationPipe.new(:deluge_threshold => 2, :notifier => notifier) }
     context 'and arrives before timer expiration and max_mesages is not exceeded' do
       it 'runs notification' do
@@ -22,6 +22,8 @@ describe NotificationPipe do
     end
 
     context 'when more than max_threshold messages arrive in same period' do
+      let(:notifier) { spy() }
+      subject(:npipe) { NotificationPipe.new(:deluge_threshold => 2, :notifier => notifier) }
       it 'sends only first max_threshold and ignores the rest' do
         20.times { npipe.process_incoming_line 'something is down|problem' }
         expect(notifier).to have_received(:notify).exactly(10).with(Notification)
@@ -29,18 +31,32 @@ describe NotificationPipe do
     end
 
     context 'when the timer expires after initial threshold is triggered' do
+      subject(:npipe) { NotificationPipe.new(:deluge_threshold => 2, :notifier => notifier) }
       let(:t1) { Time.local(2015, 9, 1, 13, 0, 0) }
       let(:t2) { Time.local(2015, 9, 1, 13, 10, 0) }
+      let(:notifier) { spy() }
 
       before { Timecop.freeze(t1) }
       after  { Timecop.return }
 
       it 'delivers remaining messages and sleeps before that' do
-        # allow(Celluloid).to receive(:sleep).and_return(nil)
         50.times { npipe.process_incoming_line 'something is down|problem' }
         Timecop.travel(t2)
         30.times { npipe.process_incoming_line 'something is down|problem' }
         expect(notifier).to have_received(:notify).exactly(20).with(Notification)
+      end
+    end
+  end
+
+  context 'when msg is a clearmsg' do
+    let(:notifier) { spy() }
+    subject(:npipe) { NotificationPipe.new(:clearing_interval => 10, :notifier => notifier) }
+
+    describe 'single message' do
+      xit 'sends a notification' do
+        expect(Kernel).to receive(:sleep).at_least(:once)
+        npipe.process_incoming_line 'host1 is up|clear'
+        expect(notifier).to have_received(:notify).exactly(:once)
       end
     end
   end
