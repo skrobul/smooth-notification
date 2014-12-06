@@ -24,7 +24,12 @@ class ProblemMessageHandler
   private
 
     def new_message_allowed?
-      (@msgs_in_this_period < @max_messages) || deluge_timer_expired?
+      if deluge_timer_expired?
+        @msgs_in_this_period = 0
+        true
+      else
+        @msgs_in_this_period < @max_messages
+      end
     end
 
     def deluge_timer_expired?
