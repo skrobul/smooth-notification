@@ -54,8 +54,8 @@ class NotificationPipe
       @socket.close
       File.delete(@socket_path)
     end
-    # @clear_msg_handler.terminate
-    # @problem_msg_handler.terminate
+    @clear_msg_handler.terminate
+    @problem_msg_handler.terminate
   end
 
   private
