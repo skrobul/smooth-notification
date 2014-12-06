@@ -15,8 +15,8 @@ class ClearMessageHandler
   end
 
   def handle_messages
-    # @timesrc.sleep @clearing_interval
-    sleep @clearing_interval
+    @timesrc.my_sleep @clearing_interval
+    #sleep @clearing_interval
     send_all_messages_in_the_buffer
   end
 
